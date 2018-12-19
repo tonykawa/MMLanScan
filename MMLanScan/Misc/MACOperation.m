@@ -97,6 +97,8 @@
 -(void)getMACDetails{
     
     self.device.ipAddress=self.ipStr;
+    self.device.isScanning = NO;
+    self.device.isScanned = NO;
     self.device.macAddress =[[MacFinder ip2mac:self.device.ipAddress] uppercaseString];
     self.device.hostname = [LANProperties getHostFromIPAddress:self.ipStr];
 

@@ -77,8 +77,8 @@ static const float PING_TIMEOUT = 1;
     while (!_stopRunLoop && [runLoop runMode: NSDefaultRunLoopMode beforeDate:loopUntil]) {
         loopUntil = [NSDate dateWithTimeIntervalSinceNow:updateInterval];
     }
-
 }
+
 -(void)ping {
     [self.simplePing start];
 }

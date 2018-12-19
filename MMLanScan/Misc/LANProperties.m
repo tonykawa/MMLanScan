@@ -34,7 +34,6 @@
         temp_addr = interfaces;
         
         while(temp_addr != NULL) {
-            
             // check if interface is en0 which is the wifi connection on the iPhone
             if(temp_addr->ifa_addr->sa_family == AF_INET) {
                 

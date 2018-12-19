@@ -96,10 +96,12 @@
             if (!weakSelf) {
                 return;
             }
+            NSLog(@"%@", ipStr);
             //Since the first half of the operation is completed we will update our proggress by 0.5
             weakSelf.currentHost = weakSelf.currentHost + 0.5;
             
         }];
+        
         
         //The Find MAC Address for each operation
         MACOperation *macOperation = [[MACOperation alloc] initWithIPToRetrieveMAC:ipStr andBrandDictionary:self.brandDictionary andCompletionHandler:^(NSError * _Nullable error, NSString * _Nonnull ip, MMDevice * _Nonnull device) {
@@ -127,10 +129,10 @@
                 }
             });
         }];
-
+        
         //Adding dependancy on macOperation. For each IP there 2 operations (macOperation and pingOperation). The dependancy makes sure that macOperation will run after pingOperation
         [macOperation addDependency:pingOperation];
-        //Adding the operations in the queue
+//        Adding the operations in the queue
         [self.queue addOperation:pingOperation];
         [self.queue addOperation:macOperation];
         
