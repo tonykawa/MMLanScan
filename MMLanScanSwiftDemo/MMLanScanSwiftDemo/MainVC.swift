@@ -18,18 +18,25 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
     @IBOutlet weak var scanButton: UIBarButtonItem!
   
     private var myContext = 0
+    var speakerName = ""
+    var searchedIPList:[MMDevice] = []
     var presenter: MainPresenter!
+    var request = Request()
+    var searchingLayer = 0
+    var foundIP = ""
     
     //MARK: - On Load Methods
     override func viewDidLoad() {
        
         super.viewDidLoad()
 
+        inputSpeakerNameAlert()
         //Init presenter. Presenter is responsible for providing the business logic of the MainVC (MVVM)
         self.presenter = MainPresenter(delegate:self)
         
         //Add observers to monitor specific values on presenter. On change of those values MainVC UI will be updated
         self.addObserversForKVO()
+        self.addNotification()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -64,6 +71,7 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
         self.showProgressBar()
         self.navigationBarTitle.title = self.presenter.ssidName()
         self.presenter.scanButtonClicked()
+        self.searchedIPList = []
     }
     
     //MARK: - Show/Hide Progress Bar
@@ -95,6 +103,7 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
         
         self.hideProgressBar()
         self.showAlert(title: "Scan Finished", message: "Number of devices connected to the Local Area Network : \(self.presenter.connectedDevices.count)")
+        self.searchCurrentSpeaker(layer: searchingLayer)
     }
     
     func mainPresenterIPSearchCancelled() {
@@ -107,6 +116,7 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
         
         self.hideProgressBar()
         self.showAlert(title: "Failed to scan", message: "Please make sure that you are connected to a WiFi before starting LAN Scan")
+        
     }
     
     //MARK: - Alert Controller
@@ -141,7 +151,20 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
         
         cell.ipLabel.text = device.ipAddress
         cell.hostnameLabel.text = device.hostname
+        if device.isScanning {
+            cell.isUserInteractionEnabled = false
+            cell.backgroundColor = UIColor.gray
+        } else if device.isScanned {
+            cell.isUserInteractionEnabled = false
+            cell.backgroundColor = UIColor.brown
+        } else {
+            cell.isUserInteractionEnabled = true
+            cell.backgroundColor = UIColor.clear
+        }
         
+        if device.ipAddress == foundIP {
+            cell.backgroundColor = UIColor.blue
+        }
         //Wont work for iOS 11
         //cell.macAddressLabel.text = device.macAddress
         //cell.brandLabel.text = device.isLocalDevice ? "Your device" : device.brand
@@ -186,4 +209,92 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
     }
     */
 
+}
+
+extension MainVC {
+    func inputSpeakerNameAlert() {
+        //1. Create the alert controller.
+        let alert = UIAlertController(title: "Speaker Name", message: "Enter a text", preferredStyle: .alert)
+        
+        //2. Add the text field. You can configure it however you need.
+        alert.addTextField { (textField) in
+            textField.text = ""
+        }
+        
+        // 3. Grab the value from the text field, and print it when the user clicks OK.
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
+            let textField = alert!.textFields![0] // Force unwrapping because we know it exists.
+            if textField.text! == "" {
+                self.speakerName = "lsx_elmo"
+            } else {
+                self.speakerName = textField.text!
+            }
+            
+            print("Text field: \(textField.text)")
+        }))
+        
+        // 4. Present the alert.
+        self.present(alert, animated: true, completion: nil)
+    }
+
+    func scanIP() {
+        request.scan(with: self.presenter.connectedDevices)
+    }
+    
+    func searchCurrentSpeaker(layer:Int) {
+        for device in self.presenter.connectedDevices {
+            switch layer {
+            case 0:
+                if device.hostname == self.speakerName {
+                    scanDevice(device)
+                }
+                break
+            case 1:
+                if device.hostname == nil {
+                    scanDevice(device)
+                }
+                break
+            case 2:
+                if device.isScanned == false {
+                    scanDevice(device)
+                }
+                break
+            default:
+                // not here
+                break
+            }
+        }
+        
+        scanIP()
+    }
+    
+    func scanDevice(_ device:MMDevice) {
+        NSLog("Found:\(device.hostname ?? nil), IP: \(device.ipAddress!)")
+        device.isScanning = true
+    }
+    
+    func addNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(onDidFoundSpeaker(_:)), name: Notification.Name("didFoundSpeaker"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(onDidFinishedSearching(_:)), name: Notification.Name("didFinishedSearching"), object: nil)
+    }
+    
+    @objc func onDidFinishedSearching(_ notification: Notification) {
+//        self.tableV.reloadData()
+        if searchingLayer + 1 < 3 {
+            searchingLayer += 1
+            self.searchCurrentSpeaker(layer: searchingLayer + 1)
+        }
+    }
+    
+    @objc func onDidFoundSpeaker(_ notification: Notification) {
+        DispatchQueue.main.async {
+            self.tableV.reloadData()
+            print(notification.userInfo)
+            if let ip = notification.userInfo?["ip"] as? String {
+                print(ip)
+                self.foundIP = ip
+            }
+        }
+    }
 }
