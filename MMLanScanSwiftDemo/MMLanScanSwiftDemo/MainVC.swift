@@ -19,7 +19,6 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
   
     private var myContext = 0
     var speakerName = ""
-    var searchedIPList:[MMDevice] = []
     var presenter: MainPresenter!
     var request = Request()
     var searchingLayer = 0
@@ -71,7 +70,7 @@ class MainVC: UIViewController, MainPresenterDelegate, UITableViewDelegate, UITa
         self.showProgressBar()
         self.navigationBarTitle.title = self.presenter.ssidName()
         self.presenter.scanButtonClicked()
-        self.searchedIPList = []
+        self.foundIP = ""
     }
     
     //MARK: - Show/Hide Progress Bar
@@ -224,13 +223,8 @@ extension MainVC {
         // 3. Grab the value from the text field, and print it when the user clicks OK.
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
             let textField = alert!.textFields![0] // Force unwrapping because we know it exists.
-            if textField.text! == "" {
-                self.speakerName = "lsx_elmo"
-            } else {
-                self.speakerName = textField.text!
-            }
-            
-            print("Text field: \(textField.text)")
+            self.speakerName = textField.text!
+            NSLog("Text field: \(textField.text)")
         }))
         
         // 4. Present the alert.
@@ -242,13 +236,23 @@ extension MainVC {
     }
     
     func searchCurrentSpeaker(layer:Int) {
+        if layer == 0 {
+            guard let currentSpeaker = self.presenter.connectedDevices.first(where: {$0.hostname == self.speakerName}) else {
+                searchingLayer += 1
+                searchCurrentSpeaker(layer: searchingLayer)
+                return
+            }
+            
+            scanDevice(currentSpeaker)
+            scanIP()
+        } else {
+            loopSearchDevice(layer: layer)
+        }
+    }
+    
+    func loopSearchDevice(layer:Int) {
         for device in self.presenter.connectedDevices {
             switch layer {
-            case 0:
-                if device.hostname == self.speakerName {
-                    scanDevice(device)
-                }
-                break
             case 1:
                 if device.hostname == nil {
                     scanDevice(device)
@@ -264,13 +268,17 @@ extension MainVC {
                 break
             }
         }
-        
         scanIP()
     }
     
     func scanDevice(_ device:MMDevice) {
         NSLog("Found:\(device.hostname ?? nil), IP: \(device.ipAddress!)")
         device.isScanning = true
+        // Skip router
+        if device.ipAddress == "192.168.1.1" {
+            device.isScanned = true
+            device.isScanning = false
+        }
     }
     
     func addNotification() {
@@ -283,16 +291,14 @@ extension MainVC {
 //        self.tableV.reloadData()
         if searchingLayer + 1 < 3 {
             searchingLayer += 1
-            self.searchCurrentSpeaker(layer: searchingLayer + 1)
+            self.searchCurrentSpeaker(layer: searchingLayer)
         }
     }
     
     @objc func onDidFoundSpeaker(_ notification: Notification) {
         DispatchQueue.main.async {
             self.tableV.reloadData()
-            print(notification.userInfo)
             if let ip = notification.userInfo?["ip"] as? String {
-                print(ip)
                 self.foundIP = ip
             }
         }
