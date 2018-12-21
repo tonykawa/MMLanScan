@@ -23,6 +23,7 @@
 		274DE7F21DCFE52200C6E09A /* DeviceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274DE7F11DCFE52200C6E09A /* DeviceCell.swift */; };
 		27603A6B1E3AAF7700F17DB5 /* data.plist in Resources */ = {isa = PBXBuildFile; fileRef = 27603A6A1E3AAF7700F17DB5 /* data.plist */; };
 		27F0DFD21F1065E40043C777 /* MMDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 27F0DFD11F1065E40043C777 /* MMDevice.m */; };
+		8363584521CA45D9000456CA /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8363584421CA45D9000456CA /* Request.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		27603A6A1E3AAF7700F17DB5 /* data.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = data.plist; sourceTree = "<group>"; };
 		27F0DFD01F1065E40043C777 /* MMDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMDevice.h; sourceTree = "<group>"; };
 		27F0DFD11F1065E40043C777 /* MMDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMDevice.m; sourceTree = "<group>"; };
+		8363584421CA45D9000456CA /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +154,7 @@
 			children = (
 				274DE7A41DCF2DE200C6E09A /* MainVC.swift */,
 				274DE7A61DCF2E1200C6E09A /* MainPresenter.swift */,
+				8363584421CA45D9000456CA /* Request.swift */,
 			);
 			name = MainVC;
 			sourceTree = "<group>";
@@ -278,7 +281,7 @@
 				TargetAttributes = {
 					274DE7681DCF2C6C00C6E09A = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = JSY962FCU8;
+						DevelopmentTeam = Y8CLJQ6FPY;
 						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
@@ -322,6 +325,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				274DE7A51DCF2DE200C6E09A /* MainVC.swift in Sources */,
+				8363584521CA45D9000456CA /* Request.swift in Sources */,
 				274DE7991DCF2CDA00C6E09A /* NetworkCalculator.m in Sources */,
 				274DE79B1DCF2CDA00C6E09A /* SimplePing.m in Sources */,
 				274DE7951DCF2CD900C6E09A /* LANProperties.m in Sources */,
@@ -471,7 +475,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JSY962FCU8;
+				DEVELOPMENT_TEAM = Y8CLJQ6FPY;
 				INFOPLIST_FILE = MMLanScanSwiftDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.miksoft.MMLanScanSwiftDemo;
@@ -493,7 +497,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JSY962FCU8;
+				DEVELOPMENT_TEAM = Y8CLJQ6FPY;
 				INFOPLIST_FILE = MMLanScanSwiftDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.miksoft.MMLanScanSwiftDemo;
